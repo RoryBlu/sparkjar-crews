@@ -1,0 +1,22 @@
+# SparkJAR Crews Requirements
+crewai==0.148.0
+crewai-tools>=0.51.1
+langchain>=0.0.350
+langchain-community>=0.0.10
+openai>=1.13.3
+python-dotenv>=1.0.0
+pyyaml>=6.0.0
+httpx>=0.25.0
+requests>=2.31.0
+
+# Tools dependencies
+pypdf>=3.17.0
+python-docx>=1.0.0
+beautifulsoup4>=4.12.0
+Pillow>=10.0.0
+playwright>=1.49.1
+
+# Google integration
+google-api-python-client>=2.100.0
+google-auth-httplib2>=0.1.1
+google-auth-oauthlib>=1.1.0
