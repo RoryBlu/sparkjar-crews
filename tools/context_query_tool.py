@@ -14,8 +14,8 @@ from uuid import UUID
 from crewai.tools import BaseTool
 from sqlalchemy import select
 
-from database.connection import get_direct_session
-from database.models import ClientUsers, Clients, Synths
+from sparkjar_shared.database.connection import get_direct_session
+from sparkjar_shared.database.models import ClientUsers, Clients, Synths
 
 class ContextQueryTool(BaseTool):
     """Simple context query tool for extracting client and actor data."""

@@ -1,0 +1,7 @@
+# Minimal requirements for testing memory maker crew
+crewai==0.148.0
+openai>=1.13.3
+python-dotenv>=1.0.0
+pyyaml>=6.0.0
+httpx>=0.25.0
+requests>=2.31.0

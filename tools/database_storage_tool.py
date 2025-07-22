@@ -10,7 +10,7 @@ import asyncio
 import json
 from datetime import datetime
 
-from database.models import ClientUsers, ClientSecrets, BookIngestions
+from sparkjar_shared.database.models import ClientUsers, ClientSecrets, BookIngestions
 
 logger = logging.getLogger(__name__)
 
@@ -38,7 +38,7 @@ class DatabaseStorageTool(BaseTool):
     async def _get_client_db_url(self, client_user_id: str) -> str:
         """Get client database URL from secrets."""
         # Import here to avoid circular imports
-        from database.connection import get_db_session
+        from sparkjar_shared.database.connection import get_db_session
         
         async with get_db_session() as session:
             # Get user's client_id

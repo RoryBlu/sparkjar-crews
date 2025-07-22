@@ -8,9 +8,9 @@ import logging
 from typing import Dict, Any, Optional, List
 from pathlib import Path
 
-from database.connection import get_direct_session
+from sparkjar_shared.database.connection import get_direct_session
 from database.crew_config_model import CrewConfig
-from database.models import ObjectSchema
+from sparkjar_shared.database.models import ObjectSchema
 from services.json_validator import validate_json_against_schema
 from sqlalchemy import select
 

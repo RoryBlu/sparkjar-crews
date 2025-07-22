@@ -14,8 +14,8 @@ from sqlalchemy import select
 from pydantic import BaseModel
 
 from crews.base import BaseCrewHandler
-from database.connection import get_direct_session
-from database.models import CrewCfgs, CrewJobs
+from sparkjar_shared.database.connection import get_direct_session
+from sparkjar_shared.database.models import CrewCfgs, CrewJobs
 
 from api.models import JobStatus
 

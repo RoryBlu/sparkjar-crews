@@ -16,7 +16,7 @@ from pydantic import BaseModel, Field
 # Database imports for credential retrieval
 from sqlalchemy import create_engine, select
 from sqlalchemy.orm import sessionmaker
-from database.models import ClientSecrets, ClientUsers
+from sparkjar_shared.database.models import ClientSecrets, ClientUsers
 
 # Google Drive API imports
 try:

@@ -9,7 +9,7 @@ from uuid import UUID
 from crewai import Agent, Crew, Process, Task
 from crewai.project import CrewBase, agent, crew, task
 
-from src.tools.sj_memory_tool_hierarchical import SJMemoryToolHierarchical
+from tools.sj_memory_tool_hierarchical import SJMemoryToolHierarchical
 
 
 @CrewBase
@@ -19,14 +19,14 @@ class MemoryMakerCrew:
     agents_config = 'config/agents.yaml'
     tasks_config = 'config/tasks.yaml'
     
-    def __init__(self, client_user_id: str, actor_type: str, actor_id: str):
+    def __init__(self, client_user_id: str = None, actor_type: str = None, actor_id: str = None):
         """
         Initialize the Memory Maker Crew.
         
         Args:
-            client_user_id: Client user identifier
-            actor_type: Type of actor (synth, human, etc.)
-            actor_id: Actor identifier
+            client_user_id: Client user identifier (optional, can be set from inputs)
+            actor_type: Type of actor (synth, human, etc.) (optional, can be set from inputs)
+            actor_id: Actor identifier (optional, can be set from inputs)
         """
         self.client_user_id = client_user_id
         self.actor_type = actor_type
@@ -34,12 +34,14 @@ class MemoryMakerCrew:
         
         # Initialize memory tool with hierarchical support
         self.memory_tool = SJMemoryToolHierarchical()
-        # Set the actor context
-        self.memory_tool.set_actor_context(
-            actor_type=actor_type,
-            actor_id=actor_id,
-            client_id=client_user_id
-        )
+        
+        # Set the actor context if provided
+        if all([actor_type, actor_id, client_user_id]):
+            self.memory_tool.set_actor_context(
+                actor_type=actor_type,
+                actor_id=actor_id,
+                client_id=client_user_id
+            )
         
     @agent
     def text_analyzer(self) -> Agent:
@@ -104,3 +106,30 @@ class MemoryMakerCrew:
             process=Process.sequential,
             verbose=2
         )
+        
+    def kickoff(self, inputs: Dict[str, Any]) -> Any:
+        """
+        Run the crew with provided inputs.
+        
+        Args:
+            inputs: Dictionary containing:
+                - text_content: The text to analyze
+                - actor_type: Type of actor (client, synth, human, etc.)
+                - actor_id: Actor identifier
+                - client_user_id: Client user identifier
+        """
+        # Extract actor context from inputs
+        actor_type = inputs.get('actor_type', self.actor_type)
+        actor_id = inputs.get('actor_id', self.actor_id)
+        client_user_id = inputs.get('client_user_id', self.client_user_id)
+        
+        # Set actor context in memory tool
+        if all([actor_type, actor_id, client_user_id]):
+            self.memory_tool.set_actor_context(
+                actor_type=actor_type,
+                actor_id=actor_id,
+                client_id=client_user_id
+            )
+        
+        # Run the crew
+        return self.crew().kickoff(inputs=inputs)

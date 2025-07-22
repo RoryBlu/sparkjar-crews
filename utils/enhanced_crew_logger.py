@@ -20,8 +20,8 @@ from queue import Queue
 import threading
 
 from sqlalchemy.ext.asyncio import AsyncSession
-from database.models import CrewJobEvent
-from database.connection import get_db_session
+from sparkjar_shared.database.models import CrewJobEvent
+from sparkjar_shared.database.connection import get_db_session
 
 logger = logging.getLogger(__name__)
 

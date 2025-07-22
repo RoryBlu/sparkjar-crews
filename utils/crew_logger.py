@@ -11,8 +11,8 @@ from io import StringIO
 import uuid
 import asyncio
 
-from database.connection import get_direct_session
-from database.models import CrewJobEvent
+from sparkjar_shared.database.connection import get_direct_session
+from sparkjar_shared.database.models import CrewJobEvent
 
 class CrewLogHandler(logging.Handler):
     """
