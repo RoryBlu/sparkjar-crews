@@ -6,10 +6,13 @@ Implements the BaseCrewHandler interface for book ingestion operations.
 import logging
 from typing import Dict, Any
 from uuid import UUID
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+import os
 
 from crews.base import BaseCrewHandler
-from src.services.json_validator import validate_crew_request, SchemaValidationError
-from .crew_production import kickoff
+from sparkjar_shared.services.schema_validator import BaseSchemaValidator
+from .crew import kickoff
 
 logger = logging.getLogger(__name__)
 
@@ -24,6 +27,20 @@ class BookIngestionCrewHandler(BaseCrewHandler):
         super().__init__(job_id)
         self.logger = logging.getLogger(self.__class__.__name__)
         self.logger.info("BookIngestionCrewHandler initialized")
+        
+        # Initialize database session for schema validation
+        database_url = os.getenv('DATABASE_URL_DIRECT')
+        if database_url:
+            # Convert asyncpg URL to psycopg2 for sync
+            sync_url = database_url.replace('postgresql+asyncpg://', 'postgresql://')
+            engine = create_engine(sync_url)
+            Session = sessionmaker(bind=engine)
+            self.db_session = Session()
+            self.schema_validator = BaseSchemaValidator(self.db_session, enable_cache=True)
+        else:
+            self.db_session = None
+            self.schema_validator = None
+            self.logger.warning("No DATABASE_URL_DIRECT found - schema validation disabled")
     
     async def execute(self, request_data: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -43,18 +60,21 @@ class BookIngestionCrewHandler(BaseCrewHandler):
             self.log_execution_start(request_data)
             
             # Validate request data against schema
-            self.logger.info("Validating request data against book_ingestion_crew schema")
-            validation_result = await validate_crew_request(
-                request_data, 
-                job_key="book_ingestion_crew"
-            )
-            
-            if not validation_result['valid']:
-                error_msg = f"Schema validation failed: {validation_result['errors']}"
-                self.logger.error(error_msg)
-                raise SchemaValidationError(error_msg, validation_result['errors'])
-            
-            self.logger.info(f"Schema validation successful using schema: {validation_result['schema_used']}")
+            if self.schema_validator:
+                validation_result = self.schema_validator.validate_data(
+                    data=request_data,
+                    schema_name="book_ingestion_crew",
+                    object_type="crew_context"
+                )
+                
+                if not validation_result.valid:
+                    error_msg = f"Schema validation failed: {', '.join(validation_result.errors)}"
+                    self.logger.error(error_msg)
+                    raise ValueError(error_msg)
+                
+                self.logger.info(f"Schema validation passed using schema: {validation_result.schema_used}")
+            else:
+                self.logger.warning("Schema validator not available - skipping validation")
             
             # Add job_id to the request data for the crew
             crew_inputs = request_data.copy()
@@ -80,9 +100,6 @@ class BookIngestionCrewHandler(BaseCrewHandler):
             
             return result
             
-        except SchemaValidationError:
-            # Re-raise schema validation errors as-is
-            raise
         except Exception as e:
             self.logger.error(f"Book ingestion crew execution failed: {str(e)}", exc_info=True)
             self.log_execution_error(e)
@@ -118,6 +135,17 @@ class BookIngestionCrewHandler(BaseCrewHandler):
         
         self.logger.info("Basic request validation successful")
         return True
+    
+    async def cleanup(self):
+        """
+        Cleanup resources after job execution.
+        """
+        try:
+            if self.db_session:
+                self.db_session.close()
+                self.logger.info("Database session closed")
+        except Exception as e:
+            self.logger.error(f"Error during cleanup: {e}")
     
     def get_job_metadata(self) -> Dict[str, Any]:
         """

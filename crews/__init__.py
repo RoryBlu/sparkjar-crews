@@ -8,13 +8,14 @@ import logging
 logger = logging.getLogger(__name__)
 
 from .base import BaseCrewHandler
-from .gen_crew.gen_crew_handler import GenCrewHandler
+# Skip gen_crew import to avoid api.models dependency
+# from .gen_crew.gen_crew_handler import GenCrewHandler
 from .book_ingestion_crew import BookIngestionCrewHandler
 from .memory_maker_crew import MemoryMakerCrewHandler
 
 # Registry of available crew handlers
 CREW_REGISTRY: Dict[str, Any] = {
-    "gen_crew": GenCrewHandler,
+    # "gen_crew": GenCrewHandler,  # Has api.models dependency
     "book_ingestion_crew": BookIngestionCrewHandler,
     "memory_maker_crew": MemoryMakerCrewHandler,
 }

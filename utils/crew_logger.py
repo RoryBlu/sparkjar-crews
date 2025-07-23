@@ -11,8 +11,14 @@ from io import StringIO
 import uuid
 import asyncio
 
-from sparkjar_shared.database.connection import get_direct_session
-from sparkjar_shared.database.models import CrewJobEvent
+# from sparkjar_shared.database.connection import get_direct_session
+# from sparkjar_shared.database.models import CrewJobEvent
+# Placeholder classes for standalone mode
+class CrewJobEvent:
+    pass
+
+def get_direct_session():
+    raise NotImplementedError("Database not available in standalone mode")
 
 class CrewLogHandler(logging.Handler):
     """

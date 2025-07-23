@@ -1,12 +1,12 @@
 """Simple Database Storage Tool for Book Ingestion."""
 import logging
 import json
-from typing import Any
+from typing import Any, Type
 from crewai.tools import BaseTool
-import asyncio
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
+from pydantic import BaseModel, Field
+import os
+from sqlalchemy import create_engine, select
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy import select
 from datetime import datetime
 
 from sparkjar_shared.database.models import ClientUsers, ClientSecrets, BookIngestions
@@ -14,15 +14,27 @@ from sparkjar_shared.database.models import ClientUsers, ClientSecrets, BookInge
 logger = logging.getLogger(__name__)
 
 
+class SimpleDBStorageToolSchema(BaseModel):
+    """Input schema for SimpleDBStorageTool - accepts parameters directly."""
+    client_user_id: str = Field(description="Client user ID")
+    book_key: str = Field(description="Book key identifier")
+    page_number: int = Field(description="Page number")
+    file_name: str = Field(description="File name")
+    language_code: str = Field(description="Language code")
+    page_text: str = Field(description="Transcribed text from OCR")
+    ocr_metadata: dict = Field(default={}, description="OCR metadata")
+
+
 class SimpleDBStorageTool(BaseTool):
     name: str = "simple_db_storage"
     description: str = "Store book page to database. Pass all parameters as a single JSON string."
+    args_schema: Type[BaseModel] = SimpleDBStorageToolSchema
     
     def __init__(self):
         super().__init__()
         self._engine = None
     
-    async def _store_page(self, params: dict) -> dict:
+    def _store_page(self, params: dict) -> dict:
         """Store page in database."""
         # Get client database URL
         from sparkjar_shared.database.connection import get_db_session
@@ -99,28 +111,45 @@ class SimpleDBStorageTool(BaseTool):
         finally:
             await engine.dispose()
     
-    def _run(self, input: str) -> str:
-        """Execute storage."""
+    def _run(self, **kwargs) -> str:
+        """Execute storage with direct parameters."""
         try:
-            # Parse input - it might be wrapped in various ways
-            if isinstance(input, dict):
-                params = input
-            else:
-                # Try to parse as JSON
-                try:
-                    params = json.loads(input)
-                except:
-                    # Try to extract JSON from string
-                    import re
-                    json_match = re.search(r'\{.*\}', input, re.DOTALL)
-                    if json_match:
-                        params = json.loads(json_match.group())
-                    else:
-                        return json.dumps({"success": False, "error": "Could not parse input"})
+            # CrewAI passes parameters directly as kwargs
+            params = kwargs
             
-            # Run async operation
-            result = asyncio.run(self._store_page(params))
-            return json.dumps(result)
+            # Run async operation - handle nested event loops
+            try:
+                loop = asyncio.get_running_loop()
+                # We're in an event loop, use run_coroutine_threadsafe
+                import concurrent.futures
+                import threading
+                
+                result = None
+                exception = None
+                
+                def run_in_thread():
+                    nonlocal result, exception
+                    try:
+                        # Create new event loop in thread
+                        new_loop = asyncio.new_event_loop()
+                        asyncio.set_event_loop(new_loop)
+                        result = new_loop.run_until_complete(self._store_page(params))
+                        new_loop.close()
+                    except Exception as e:
+                        exception = e
+                
+                thread = threading.Thread(target=run_in_thread)
+                thread.start()
+                thread.join()
+                
+                if exception:
+                    raise exception
+                    
+                return json.dumps(result)
+            except RuntimeError:
+                # No event loop, can use asyncio.run
+                result = asyncio.run(self._store_page(params))
+                return json.dumps(result)
             
         except Exception as e:
             logger.error(f"Storage error: {e}")

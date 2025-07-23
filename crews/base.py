@@ -218,22 +218,10 @@ class BaseCrewHandler(ABC):
         if not events:
             return
         
-        # Save events to database
-        from .database.connection import get_db_session
-        from .database.models import CrewJobEvent
+        # Save events to database - skip in standalone mode
+        self.logger.info("Skipping database save in standalone mode")
+        return
         
-        async with get_db_session() as db:
-            for event in events:
-                db_event = CrewJobEvent(
-                    job_id=event['job_id'],
-                    event_type=event['event_type'],
-                    event_data=event['event_data'],
-                    event_time=event['event_time']
-                )
-                db.add(db_event)
-            await db.commit()
-            
-        self.logger.info(f"Saved {len(events)} crew events to database")
     
     async def validate_crew_context(self, request_data: Dict[str, Any], context_schema: Dict[str, Any]) -> Dict[str, Any]:
         """

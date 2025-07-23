@@ -7,8 +7,8 @@ from typing import Dict, Any, List, Optional, Union
 from uuid import UUID
 from datetime import datetime
 
-from src.crews.base import BaseCrewHandler
-from src.database.models import CrewJob
+from crews.base import BaseCrewHandler
+# from src.database.models import CrewJob  # Not needed in standalone
 from .crew import MemoryMakerCrew
 
 logger = logging.getLogger(__name__)

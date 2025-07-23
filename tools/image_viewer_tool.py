@@ -38,13 +38,14 @@ class ImageViewerTool(BaseTool):
             # Create the transcription prompt
             prompt = """You are transcribing a handwritten Spanish manuscript page. Follow these steps:
 
-1. VIEW the image carefully and transcribe EXACTLY what you see written
-2. Start from "que" if visible and transcribe through the entire document
-3. When handwriting is unclear:
+1. CRITICAL: Start from the VERY TOP of the page - capture EVERY line including the first 4-5 lines
+2. VIEW the entire image carefully and transcribe EXACTLY what you see written
+3. Do NOT skip any lines at the beginning - start from the absolute top
+4. When handwriting is unclear:
    - Use context clues, logic, and letter placement to make your best effort
    - Mark uncertain words with [?] after them
    - Mark completely illegible words as [illegible]
-4. Preserve original line breaks where clear
+5. Preserve original line breaks where clear
 
 After transcription, provide statistics in this format:
 {
@@ -60,8 +61,8 @@ After transcription, provide statistics in this format:
 
 Transcribe everything you see, maintaining the original Spanish text exactly as written."""
 
-            # Call GPT-4o with the image
-            response = client.chat.completions.create(
+            # PASS 1: Initial transcription
+            response1 = client.chat.completions.create(
                 model="gpt-4o",
                 messages=[
                     {
@@ -78,11 +79,64 @@ Transcribe everything you see, maintaining the original Spanish text exactly as 
                     }
                 ],
                 max_tokens=2000,
-                temperature=0.1  # Low temperature for accuracy
+                temperature=0.1
             )
             
-            # Parse the response
-            result = response.choices[0].message.content
+            # PASS 2: Review and improve unclear sections
+            pass2_prompt = f"""Review this transcription and the image again. Focus on any [?] or [illegible] sections.
+Previous transcription: {response1.choices[0].message.content}
+
+Look at the image again and try to improve any unclear parts. Return the same JSON format with improvements."""
+            
+            response2 = client.chat.completions.create(
+                model="gpt-4o",
+                messages=[
+                    {
+                        "role": "user",
+                        "content": [
+                            {"type": "text", "text": pass2_prompt},
+                            {
+                                "type": "image_url",
+                                "image_url": {
+                                    "url": f"data:image/jpeg;base64,{base64_image}"
+                                }
+                            }
+                        ]
+                    }
+                ],
+                max_tokens=2000,
+                temperature=0.1
+            )
+            
+            # PASS 3: Final verification and quality check
+            pass3_prompt = f"""Final pass - verify the transcription is complete and accurate.
+Current transcription: {response2.choices[0].message.content}
+
+CRITICAL: Ensure the FIRST 4-5 lines at the TOP of the page are included. If missing, add them now.
+Return the final JSON format."""
+            
+            response3 = client.chat.completions.create(
+                model="gpt-4o",
+                messages=[
+                    {
+                        "role": "user",
+                        "content": [
+                            {"type": "text", "text": pass3_prompt},
+                            {
+                                "type": "image_url",
+                                "image_url": {
+                                    "url": f"data:image/jpeg;base64,{base64_image}"
+                                }
+                            }
+                        ]
+                    }
+                ],
+                max_tokens=2000,
+                temperature=0.1
+            )
+            
+            # Use the final pass result
+            result = response3.choices[0].message.content
             
             # Try to parse as JSON, or wrap in JSON if not
             try:
