@@ -1,132 +1,73 @@
-# Book Ingestion Crew - Requirements Specification
+# Requirements Document
 
-## 1. Purpose
-Create a production-ready book ingestion crew that processes handwritten manuscript images from Google Drive, performs OCR, and stores the transcribed text in a PostgreSQL database.
+## Introduction
 
-## 2. Core Requirements
+This specification defines the requirements for a production-ready book ingestion crew that processes handwritten manuscript images from Google Drive, performs OCR using GPT-4o, and stores the transcribed text in a PostgreSQL database. The system must follow CrewAI standards and the KISS principle for maintainable, reliable operation.
 
-### 2.1 Functional Requirements
-- **Input**: Google Drive folder URL containing manuscript page images
-- **Processing**: 
-  - Download files one at a time (not batch)
-  - OCR each image using GPT-4o (3 passes for accuracy)
-  - Store transcribed text in database
-- **Output**: Transcribed pages stored in BookIngestions table
-- **Languages**: Support multiple languages (specified in input)
-- **File Types**: Support all image formats (PNG, JPG, JPEG, WEBP, GIF, BMP, TIFF)
+## Requirements
 
-### 2.2 KISS Principle (MANDATORY)
-- Get list of files from Google Drive
-- For each file:
-  1. Download it
-  2. OCR it (3 passes)
-  3. Save to database
-  4. Move to next file
-- NO additional complexity
+### Requirement 1
 
-### 2.3 Performance Requirements
-- Process pages sequentially (one at a time)
-- Maximum 4 LLM calls per page:
-  - 1 agent coordination call
-  - 3 OCR passes (all in the tool)
-- Must capture top 4-5 lines of each page (current issue)
+**User Story:** As a content manager, I want to process manuscript images from Google Drive, so that I can digitize handwritten books into searchable text format.
 
-## 3. Technical Architecture
+#### Acceptance Criteria
 
-### 3.1 CrewAI Standards (MUST FOLLOW)
-```yaml
-# agents.yaml structure
-coordinator:
-  role: "Book Ingestion Coordinator"
-  goal: "Process manuscript pages from Google Drive"
-  model: "gpt-4o-mini"  # Standard model
-  tools:
-    - google_drive_tool
-    - image_viewer_tool
-    - db_storage_tool
+1. WHEN a Google Drive folder URL is provided THEN the system SHALL list all image files in the folder
+2. WHEN processing begins THEN the system SHALL download files one at a time sequentially
+3. WHEN an image is downloaded THEN the system SHALL support PNG, JPG, JPEG, WEBP, GIF, BMP, and TIFF formats
+4. WHEN processing completes THEN the system SHALL store transcribed pages in the BookIngestions database table
 
-# tasks.yaml structure  
-process_pages:
-  description: "Process each manuscript page"
-  expected_output: "Status of processed pages"
-  agent: coordinator
-```
+### Requirement 2
 
-### 3.2 Input Schema
-```json
-{
-  "job_key": "book_ingestion_crew",
-  "google_drive_folder_path": "string (URL)",
-  "client_user_id": "string (UUID)",
-  "actor_type": "string",
-  "actor_id": "string (UUID)",
-  "book_title": "string",
-  "book_author": "string",
-  "language": "string (ISO code, default: 'es')",
-  "process_pages_limit": "integer (optional)"
-}
-```
+**User Story:** As a quality assurance specialist, I want OCR processing with multiple passes, so that I can ensure accurate text transcription from handwritten manuscripts.
 
-### 3.3 Database Schema (BookIngestions)
-- book_key: Google Drive folder URL
-- page_number: Extracted from filename
-- file_name: Original filename (key identifier)
-- language_code: From input
-- version: "original"
-- page_text: OCR result
-- ocr_metadata: JSON with file_id and stats
+#### Acceptance Criteria
 
-### 3.4 Tools Required
-1. **GoogleDriveTool**: List files (NO download in listing)
-2. **GoogleDriveDownloadTool**: Download one file at a time
-3. **ImageViewerTool**: 3-pass OCR with GPT-4o
-4. **DBStorageTool**: Simple synchronous database storage
+1. WHEN an image is processed THEN the system SHALL perform exactly 3 OCR passes using GPT-4o
+2. WHEN OCR processing occurs THEN the system SHALL capture the complete page content including the top 4-5 lines
+3. WHEN processing a page THEN the system SHALL use a maximum of 4 LLM calls (1 coordination + 3 OCR passes)
+4. WHEN OCR completes THEN the system SHALL store the transcribed text with metadata including file_id and processing stats
 
-## 4. Implementation Standards
+### Requirement 3
 
-### 4.1 File Structure
-```
-crews/book_ingestion_crew/
-├── __init__.py
-├── crew.py              # CrewAI crew definition
-├── config/
-│   ├── agents.yaml     # Agent definitions
-│   └── tasks.yaml      # Task definitions
-└── utils.py            # Utility functions
-```
+**User Story:** As a system administrator, I want the crew to follow CrewAI standards, so that I can maintain and deploy the system reliably.
 
-### 4.2 Code Standards
-- Use CrewAI's `kickoff_for_each` for page processing
-- YAML-based configuration (no hardcoded agents)
-- Standard OpenAI models only
-- Proper error handling and logging
-- Schema validation for inputs
+#### Acceptance Criteria
 
-### 4.3 What NOT to Do
-- ❌ NO custom process loops
-- ❌ NO non-standard model names
-- ❌ NO async complexity in tools
-- ❌ NO multiple tool versions
-- ❌ NO feature creep beyond requirements
+1. WHEN the crew is configured THEN the system SHALL use YAML-based agent and task definitions
+2. WHEN agents are defined THEN the system SHALL use only standard OpenAI models (gpt-4.1-mini for coordination)
+3. WHEN processing occurs THEN the system SHALL use CrewAI's kickoff_for_each method for page processing
+4. WHEN tools are integrated THEN the system SHALL use GoogleDriveTool, GoogleDriveDownloadTool, ImageViewerTool, and DBStorageTool
 
-## 5. Testing Requirements
-- Test with 5 manuscript pages
-- Verify all pages stored correctly
-- Check OCR captures top lines
-- Validate 4 LLM calls per page limit
-- All tests must pass
+### Requirement 4
 
-## 6. Success Criteria
-1. Follows CrewAI standards with YAML configs
-2. Successfully processes 5 test pages
-3. Stores all transcriptions in database
-4. Uses only 4 LLM calls per page
-5. Captures complete page content including top lines
-6. Simple, maintainable code following KISS principle
+**User Story:** As a developer, I want proper input validation and schema compliance, so that I can ensure data integrity and system reliability.
 
-## 7. Current Blockers
-1. Abandoned YAML configuration needs restoration
-2. Non-existent model usage needs correction
-3. Storage tool async/sync issues need simplification
-4. Missing schema validation
-5. Complex manual orchestration needs removal
+#### Acceptance Criteria
+
+1. WHEN input is received THEN the system SHALL validate against the defined JSON schema
+2. WHEN required fields are missing THEN the system SHALL return appropriate error messages
+3. WHEN language is specified THEN the system SHALL support multiple languages with ISO language codes
+4. WHEN optional process_pages_limit is provided THEN the system SHALL respect the limit during processing
+
+### Requirement 5
+
+**User Story:** As a database administrator, I want structured data storage, so that I can query and manage transcribed content effectively.
+
+#### Acceptance Criteria
+
+1. WHEN storing transcriptions THEN the system SHALL use the BookIngestions table schema
+2. WHEN saving page data THEN the system SHALL include book_key, page_number, file_name, language_code, version, page_text, and ocr_metadata
+3. WHEN extracting page numbers THEN the system SHALL derive page_number from the original filename
+4. WHEN storing metadata THEN the system SHALL save OCR processing statistics as JSON
+
+### Requirement 6
+
+**User Story:** As a performance monitor, I want efficient sequential processing, so that I can ensure system resources are used optimally.
+
+#### Acceptance Criteria
+
+1. WHEN processing multiple pages THEN the system SHALL process pages sequentially, not in parallel
+2. WHEN downloading files THEN the system SHALL download one file at a time, not in batches
+3. WHEN processing completes THEN the system SHALL move to the next file only after current file is fully processed
+4. WHEN errors occur THEN the system SHALL implement proper error handling and logging without stopping the entire process
