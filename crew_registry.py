@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 from .base import BaseCrewHandler
 from .gen_crew.gen_crew_handler import GenCrewHandler
-from .book_ingestion_crew import BookIngestionCrewHandler
+from .crews.book_ingestion_crew import BookIngestionCrewHandler
 from .memory_maker_crew import MemoryMakerCrewHandler
 
 # Registry of available crew handlers

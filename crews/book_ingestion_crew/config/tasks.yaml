@@ -1,0 +1,44 @@
+download_task:
+  description: |
+    Download the specified file from Google Drive using GoogleDriveDownloadTool.
+    
+    Parameters:
+    - file_id: {file_id}
+    - file_name: {file_name}
+    - client_user_id: {client_user_id}
+    
+    Return the local file path for the downloaded file.
+  expected_output: Local file path to the downloaded image file
+  agent: download_agent
+
+ocr_task:
+  description: |
+    Extract text from the downloaded image using ImageViewerTool.
+    
+    Use the image path from the download task to perform OCR processing.
+    The tool will automatically perform 3 OCR passes for accurate transcription.
+    
+    Image path: {image_path}
+  expected_output: JSON object with transcribed text, statistics, and unclear sections
+  agent: ocr_agent
+  context:
+    - download_task
+
+storage_task:
+  description: |
+    Store the transcribed page data in the database using SyncDBStorageTool.
+    
+    Parameters:
+    - client_user_id: {client_user_id}
+    - book_key: {book_key}
+    - page_number: {page_number}
+    - file_name: {file_name}
+    - language_code: {language_code}
+    - page_text: {page_text}
+    - ocr_metadata: {ocr_metadata}
+    
+    Save the transcription results to the BookIngestions table.
+  expected_output: JSON object with success status and page_id
+  agent: storage_agent
+  context:
+    - ocr_task

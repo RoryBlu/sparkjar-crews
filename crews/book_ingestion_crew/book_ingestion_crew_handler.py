@@ -36,7 +36,8 @@ class BookIngestionCrewHandler(BaseCrewHandler):
             engine = create_engine(sync_url)
             Session = sessionmaker(bind=engine)
             self.db_session = Session()
-            self.schema_validator = BaseSchemaValidator(self.db_session, enable_cache=True)
+            self.schema_validator = BaseSchemaValidator(self.db_session)
+            self.schema_validator.enable_cache(True)
         else:
             self.db_session = None
             self.schema_validator = None
@@ -107,10 +108,10 @@ class BookIngestionCrewHandler(BaseCrewHandler):
     
     def validate_request(self, request_data: Dict[str, Any]) -> bool:
         """
-        Validate the request data before execution.
+        Validate the request data before execution using Pydantic schema.
         
-        Note: Schema validation is now handled in execute() method using database schemas.
-        This method provides basic structural validation.
+        This method provides comprehensive input validation using the Pydantic model
+        in addition to the database schema validation in execute() method.
         
         Args:
             request_data: Request data to validate
@@ -121,29 +122,46 @@ class BookIngestionCrewHandler(BaseCrewHandler):
         # First, call parent validation for required fields
         super().validate_request(request_data)
         
-        # Check for required book ingestion fields (basic validation)
-        required_fields = ['google_drive_folder_path', 'language']
-        missing_fields = [field for field in required_fields if field not in request_data]
+        # Use Pydantic validation for comprehensive input validation
+        from .schema import validate_book_ingestion_input
         
-        if missing_fields:
-            raise ValueError(f"Missing required fields for book ingestion: {missing_fields}")
+        validation_result = validate_book_ingestion_input(request_data)
         
-        # Validate language field
-        valid_languages = ['en', 'es', 'fr', 'de', 'it', 'pt', 'nl', 'pl', 'ru', 'ja', 'zh']
-        if request_data.get('language') not in valid_languages:
-            raise ValueError(f"Invalid language '{request_data.get('language')}'. Must be one of: {valid_languages}")
+        if not validation_result.valid:
+            # Create detailed error message from validation errors
+            error_details = []
+            for error in validation_result.errors:
+                error_details.append(f"{error.field}: {error.message}")
+            
+            error_message = f"Input validation failed: {'; '.join(error_details)}"
+            self.logger.error(error_message)
+            raise ValueError(error_message)
         
-        self.logger.info("Basic request validation successful")
+        # Log successful validation with any warnings
+        if validation_result.warnings:
+            for warning in validation_result.warnings:
+                self.logger.warning(f"Validation warning: {warning}")
+        
+        self.logger.info("Pydantic input validation successful")
         return True
     
     async def cleanup(self):
         """
         Cleanup resources after job execution.
+        
+        This includes:
+        - Closing database sessions
+        - Cleaning up temporary files
+        - Releasing any held resources
         """
         try:
             if self.db_session:
                 self.db_session.close()
                 self.logger.info("Database session closed")
+                
+            # Note: The ResourceManager cleanup is handled within the crew execution
+            # If we had a persistent resource manager, we would clean it up here
+            
         except Exception as e:
             self.logger.error(f"Error during cleanup: {e}")
     
