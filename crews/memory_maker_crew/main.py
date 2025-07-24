@@ -11,11 +11,11 @@ from pathlib import Path
 
 # Add paths for imports
 current_dir = Path(__file__).parent
-crew_api_dir = current_dir.parent.parent.parent
-project_root = crew_api_dir.parent.parent
+crews_dir = current_dir.parent
+sparkjar_crews_dir = crews_dir.parent
 
-sys.path.insert(0, str(crew_api_dir))
-sys.path.insert(0, str(project_root))
+sys.path.insert(0, str(sparkjar_crews_dir))
+sys.path.insert(0, str(current_dir))
 
 # Set up environment
 os.environ["ENVIRONMENT"] = os.environ.get("ENVIRONMENT", "development")
@@ -28,7 +28,7 @@ async def main():
     print("🚀 Testing Memory Maker Crew directly...")
     
     # Load the test payload
-    payload_path = project_root / "test_payloads" / "vervelyn_corporate_policy_payload.json"
+    payload_path = Path("/Users/r.t.rawlings/sparkjar-crew/_reorg/sparkjar-crew-api/test_payloads/vervelyn_corporate_policy_payload.json")
     
     if not payload_path.exists():
         print(f"❌ Test payload not found at: {payload_path}")

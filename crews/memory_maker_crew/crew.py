@@ -104,7 +104,7 @@ class MemoryMakerCrew:
             agents=self.agents,
             tasks=self.tasks,
             process=Process.sequential,
-            verbose=2
+            verbose=True
         )
         
     def kickoff(self, inputs: Dict[str, Any]) -> Any:

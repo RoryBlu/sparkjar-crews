@@ -164,15 +164,35 @@ class MemoryMakerCrewHandler(BaseCrewHandler):
             else:
                 output = str(result)
                 
-            # Parse the output (this will depend on how the crew structures its output)
-            # For MVP, we'll do basic parsing
-            extraction_results["summary"] = f"Processed text and extracted memories"
+            logger.debug(f"Raw crew output: {output}")
             
-            # In production, this would parse the actual structured output from the crew
-            # containing the specific entities, observations, and relationships
+            # The final task (store_memories) outputs a report of memory operations
+            # Parse the output to extract the actual results
+            output_str = str(output).lower()
+            
+            # Count entities created/updated
+            entities_created = output_str.count("entity created") + output_str.count("created entity")
+            entities_updated = output_str.count("entity updated") + output_str.count("updated entity")
+            
+            # Count observations and relationships
+            observations_added = output_str.count("observation") + output_str.count("observations added")
+            relationships_created = output_str.count("relationship created") + output_str.count("created relationship")
+            
+            # Extract summary
+            if entities_created > 0 or entities_updated > 0:
+                extraction_results["summary"] = f"Successfully processed text: {entities_created} entities created, {entities_updated} entities updated, {observations_added} observations added"
+            else:
+                extraction_results["summary"] = "Text processed but no memories extracted"
+            
+            # Since the crew doesn't return structured data, we'll populate counts
+            # In a future iteration, we could parse the actual entity names from the output
+            extraction_results["entities_created"] = [f"entity_{i+1}" for i in range(entities_created)]
+            extraction_results["entities_updated"] = [f"updated_entity_{i+1}" for i in range(entities_updated)]
+            extraction_results["observations_added"] = [f"observation_{i+1}" for i in range(observations_added)]
+            extraction_results["relationships_created"] = [f"relationship_{i+1}" for i in range(relationships_created)]
             
         except Exception as e:
-            logger.error(f"Error parsing crew results: {e}")
+            logger.error(f"Error parsing crew results: {e}", exc_info=True)
             extraction_results["summary"] = "Memory extraction completed with parsing errors"
             
         return extraction_results

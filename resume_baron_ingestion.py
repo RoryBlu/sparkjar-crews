@@ -167,14 +167,14 @@ async def process_page_with_timeout(page_info: Dict, tools: Dict, client_user_id
 
 
 async def resume_manuscript_processing():
-    """Resume processing from page 409 through the end."""
+    """Resume processing from page 479 through the end."""
     
     start_time = time.time()
     
     # Configuration
     client_user_id = "3a411a30-1653-4caf-acee-de257ff50e36"
     folder_url = "https://drive.google.com/drive/u/0/folders/1HFDpMUHT0wjVWdWB9XIUMYavmq23I4JO"
-    START_PAGE = 409  # Resume from this page number
+    START_PAGE = 481  # Resume from this page number (480/baron020 4.png confirmed in DB)
     
     print("=" * 80)
     print("🔄 RESUMING BARON DE LA DROGUE MANUSCRIPT INGESTION")
