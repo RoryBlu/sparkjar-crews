@@ -58,7 +58,8 @@ def test_vervelyn_policy():
         'text_content': request_data['text_content'],
         'actor_type': request_data['actor_type'],
         'actor_id': request_data['actor_id'],
-        'client_user_id': request_data['client_user_id']
+        'client_user_id': request_data['client_user_id'],
+        'metadata': request_data.get('metadata', {})
     }
     
     # Execute the crew
