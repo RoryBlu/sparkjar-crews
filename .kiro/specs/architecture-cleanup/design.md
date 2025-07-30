@@ -61,7 +61,6 @@ GitHub Organization: SparkJAR/
 ├── sparkjar-crews/             # All CrewAI Implementations  
 ├── sparkjar-memory-service/    # Memory Management (int/ext)
 ├── sparkjar-shared/            # Shared Library Package
-└── sparkjar-thinking/          # Sequential Thinking Service
 ```
 
 ## Service Definitions
