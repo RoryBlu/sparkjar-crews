@@ -27,7 +27,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'
 
 # Import crew components
 from crews.book_ingestion_crew.crew import kickoff
-from utils.simple_crew_logger import SimpleCrewLogger
+from sparkjar_shared.crews import SimpleCrewLogger
 
 # Configure logging
 logging.basicConfig(

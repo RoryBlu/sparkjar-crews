@@ -28,7 +28,15 @@ async def main():
     print("🚀 Testing Memory Maker Crew directly...")
     
     # Load the test payload
-    payload_path = Path("/Users/r.t.rawlings/sparkjar-crew/_reorg/sparkjar-crew-api/test_payloads/vervelyn_corporate_policy_payload.json")
+    # Use relative path from the crew location
+    base_path = Path(__file__).parent.parent.parent.parent
+    payload_path = base_path / "sparkjar-crew-api" / "test_payloads" / "vervelyn_corporate_policy_payload.json"
+    
+    # Fallback to environment variable if needed
+    if not payload_path.exists():
+        env_path = os.getenv("VERVELYN_PAYLOAD_PATH")
+        if env_path:
+            payload_path = Path(env_path)
     
     if not payload_path.exists():
         print(f"❌ Test payload not found at: {payload_path}")

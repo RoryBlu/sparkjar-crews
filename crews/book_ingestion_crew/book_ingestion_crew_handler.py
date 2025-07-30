@@ -10,7 +10,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 import os
 
-from crews.base import BaseCrewHandler
+from sparkjar_shared.crews import BaseCrewHandler
 from sparkjar_shared.services.schema_validator import BaseSchemaValidator
 from .crew import kickoff
 

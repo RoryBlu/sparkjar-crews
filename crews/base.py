@@ -8,8 +8,7 @@ from uuid import UUID
 import logging
 import jsonschema
 from jsonschema import ValidationError as JsonSchemaValidationError
-from utils.simple_crew_logger import SimpleCrewLogger
-from utils.crew_logger import CrewExecutionLogger
+from sparkjar_shared.crews import SimpleCrewLogger, CrewExecutionLogger
 
 logger = logging.getLogger(__name__)
 

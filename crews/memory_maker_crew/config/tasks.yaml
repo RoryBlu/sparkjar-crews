@@ -46,25 +46,37 @@ structure_memories:
 
 store_memories:
   description: >
-    Use the memory tool to store all structured memories in the system. 
-    For each memory entity:
+    Use the memory wrapper tools to store all structured memories in the system. 
     
-    1. Use the upsert_entity action to create or update entities
-       - This automatically handles checking if entity exists
-       - Updates existing entities with new observations
-       - Creates new entities if they don't exist
-    2. Store all identified relationships using create_relationship
-    3. Ensure proper hierarchy context (actor, synth_class, client levels)
-    4. Verify successful storage and handle any errors
+    Available tools for storing memories:
     
-    Example upsert: {"action": "upsert_entity", "params": {"name": "Policy Name", "entity_type": "policy", "observations": [...], "metadata": {...}}}
+    1. create_memory_entity: Create a new entity
+       - Parameters: name (string), entity_type (string), metadata (optional dict)
+       - Example: create_memory_entity(name="leave_policy", entity_type="policy", metadata={"category": "HR"})
     
-    Use the hierarchical memory tool to ensure memories are stored at the 
-    appropriate level based on the actor context.
+    2. add_memory_observation: Add observations to existing entities
+       - Parameters: entity_name, observation, observation_type, source
+       - Example: add_memory_observation(entity_name="leave_policy", observation="21 days annual leave", observation_type="policy_content")
+    
+    3. create_memory_relationship: Link entities together
+       - Parameters: from_entity, to_entity, relationship_type
+       - Example: create_memory_relationship(from_entity="leave_policy", to_entity="hr_department", relationship_type="managed_by")
+    
+    4. store_entity_with_observations: Create entity and add observations in one call
+       - Parameters: name, entity_type, observations (list), metadata
+       - Example: store_entity_with_observations(name="policy", entity_type="policy", observations=[{"content": "...", "type": "policy_content"}])
+    
+    5. search_memories: Verify storage with hierarchical search
+       - Parameters: query_text, entity_type (optional), include_hierarchy (default: True)
+       - Example: search_memories(query_text="leave policy", include_hierarchy=True)
+    
+    The tools handle all JSON formatting internally. Just call them with regular parameters!
+    The hierarchical context (actor, synth_class, client levels) is handled automatically.
   expected_output: >
     A detailed report of all memory operations performed, including:
-    - Entities created or updated
-    - Observations added
+    - Entities created
+    - Observations added to each entity
     - Relationships stored
     - Any errors encountered
+    - Verification that memories were stored correctly
     - Summary of what was learned from the conversation

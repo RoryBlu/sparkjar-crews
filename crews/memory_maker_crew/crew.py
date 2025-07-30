@@ -10,6 +10,7 @@ from crewai import Agent, Crew, Process, Task
 from crewai.project import CrewBase, agent, crew, task
 
 from tools.sj_memory_tool_hierarchical import SJMemoryToolHierarchical
+from .tools.memory_wrapper_tools import create_memory_wrapper_tools
 
 
 @CrewBase
@@ -43,6 +44,9 @@ class MemoryMakerCrew:
                 client_id=client_user_id
             )
         
+        # Create wrapper tools for easier agent usage
+        self.wrapper_tools = create_memory_wrapper_tools(self.memory_tool)
+        
     @agent
     def text_analyzer(self) -> Agent:
         """
@@ -51,7 +55,7 @@ class MemoryMakerCrew:
         """
         return Agent(
             config=self.agents_config['text_analyzer'],
-            tools=[self.memory_tool],
+            tools=self.wrapper_tools,  # Use wrapper tools for easier usage
             verbose=True
         )
         
@@ -63,7 +67,7 @@ class MemoryMakerCrew:
         """
         return Agent(
             config=self.agents_config['memory_structurer'],
-            tools=[self.memory_tool],
+            tools=self.wrapper_tools,  # Use wrapper tools for easier usage
             verbose=True
         )
         

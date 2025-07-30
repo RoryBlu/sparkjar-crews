@@ -10,7 +10,21 @@ def analyze_vervelyn_policy():
     """Analyze the Vervelyn corporate policy to show proper realm categorization."""
     
     # Load the test payload
-    payload_path = "/Users/r.t.rawlings/sparkjar-crew/_reorg/sparkjar-crew-api/test_payloads/vervelyn_corporate_policy_payload.json"
+    from pathlib import Path
+    import os
+    
+    # Use relative path from the crew location
+    base_path = Path(__file__).parent.parent.parent.parent
+    payload_path = base_path / "sparkjar-crew-api" / "test_payloads" / "vervelyn_corporate_policy_payload.json"
+    
+    # Fallback to environment variable if needed
+    if not payload_path.exists():
+        env_path = os.getenv("VERVELYN_PAYLOAD_PATH")
+        if env_path:
+            payload_path = Path(env_path)
+        else:
+            # Last resort for backward compatibility
+            payload_path = Path("/Users/r.t.rawlings/sparkjar-crew/_reorg/sparkjar-crew-api/test_payloads/vervelyn_corporate_policy_payload.json")
     
     with open(payload_path, 'r') as f:
         payload = json.load(f)

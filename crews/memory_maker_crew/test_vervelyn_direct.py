@@ -18,7 +18,13 @@ def test_vervelyn_policy():
     """Test the Memory Maker Crew with Vervelyn corporate policy."""
     
     # Load the test payload
-    payload_path = "/Users/r.t.rawlings/sparkjar-crew/_reorg/sparkjar-crew-api/test_payloads/vervelyn_corporate_policy_payload.json"
+    payload_path = Path(__file__).parent.parent.parent.parent / "sparkjar-crew-api" / "test_payloads" / "vervelyn_corporate_policy_payload.json"
+    
+    # Fallback to environment variable if needed
+    if not payload_path.exists():
+        env_path = os.getenv("VERVELYN_PAYLOAD_PATH")
+        if env_path:
+            payload_path = Path(env_path)
     
     with open(payload_path, 'r') as f:
         payload = json.load(f)
