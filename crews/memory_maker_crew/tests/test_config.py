@@ -104,7 +104,7 @@ class TestMemoryMakerConfig:
             with pytest.raises(ValidationError) as exc_info:
                 MemoryMakerConfig()
             
-            assert 'ensure this value is greater than or equal to 1' in str(exc_info.value)
+            assert 'greater than or equal to 1' in str(exc_info.value)
     
     def test_invalid_retry_attempts_range(self):
         """Test validation error for retry attempts out of range."""
@@ -116,7 +116,7 @@ class TestMemoryMakerConfig:
             with pytest.raises(ValidationError) as exc_info:
                 MemoryMakerConfig()
             
-            assert 'ensure this value is greater than or equal to 1' in str(exc_info.value)
+            assert 'greater than or equal to 1' in str(exc_info.value)
     
     def test_invalid_backoff_factor_range(self):
         """Test validation error for backoff factor out of range."""
@@ -128,7 +128,7 @@ class TestMemoryMakerConfig:
             with pytest.raises(ValidationError) as exc_info:
                 MemoryMakerConfig()
             
-            assert 'ensure this value is greater than or equal to 1' in str(exc_info.value)
+            assert 'greater than or equal to 1' in str(exc_info.value)
     
     def test_max_text_length_less_than_min(self):
         """Test validation error when max_text_length is less than min_text_length."""
@@ -227,4 +227,4 @@ class TestConfigurationSingleton:
         """Test that validation errors are properly propagated."""
         with patch.dict(os.environ, {}, clear=True):
             with pytest.raises(ValidationError):
-                get_config()
+                reload_config()
