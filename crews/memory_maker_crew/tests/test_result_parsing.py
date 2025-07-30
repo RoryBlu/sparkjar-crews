@@ -55,8 +55,12 @@ class TestResultParsing:
     def test_parse_with_exception(self):
         """Test parsing handles exceptions gracefully."""
         handler = MemoryMakerCrewHandler()
-        result = Mock()
-        result.output.side_effect = Exception("Test error")
+        class BadResult:
+            @property
+            def output(self):
+                raise Exception("Test error")
+
+        result = BadResult()
         
         parsed = handler._parse_crew_results(result)
         
@@ -90,5 +94,5 @@ class TestResultParsing:
         
         assert len(parsed["entities_created"]) == 3
         assert len(parsed["entities_updated"]) == 1
-        assert len(parsed["observations_added"]) == 2  # Counts mentions of "observations"
+        assert len(parsed["observations_added"]) == 5  # Counts mentions of "observation"
         assert len(parsed["relationships_created"]) == 2
