@@ -143,6 +143,25 @@ MEMORY_SERVICE_URL=http://memory-internal:8001
 API_HOST=0.0.0.0
 API_PORT=8001
 ENVIRONMENT=development
+# Additional Optional Variables
+DATABASE_URL_DIRECT=postgresql://...   # Direct DB connection for tools
+SERPER_API_KEY=your-key-here          # Serper search API
+SCRAPER_SESSION_TTL=300               # Seconds to keep headless scraper alive
+REDIS_URL=redis://localhost:6379/0    # Redis cache for scraper sessions
+EMBEDDING_PROVIDER=openai             # Embedding provider (custom or openai)
+OPENAI_EMBEDDING_MODEL=text-embedding-3-small  # Embedding model for OpenAI
+OPENAI_EMBEDDING_DIMENSION=1536       # Embedding dimension for OpenAI
+OPENAI_API_URL=https://api.openai.com/v1/embeddings  # Override embeddings endpoint
+EMBEDDING_DIMENSION=768               # Dimension for custom embedding service
+GOOGLE_CSE_ID=your-cse-id             # Google Custom Search ID
+GOOGLE_SEARCH_API_URL=https://www.googleapis.com/customsearch/v1  # Custom search endpoint
+MEMORY_MAKER_TIMEOUT=30               # Timeout for memory maker crew
+MEMORY_MAKER_RETRY_ATTEMPTS=3         # Retry attempts for memory maker crew
+MEMORY_MAKER_RETRY_BACKOFF=2.0        # Exponential backoff for memory maker
+MEMORY_MAKER_MAX_TEXT_LENGTH=100000   # Max text length for memory maker
+MEMORY_MAKER_DEBUG=false              # Debug logging for memory maker
+VERVELYN_PAYLOAD_PATH=/path/to/payload # Path for dev Vervelyn payload
+VERBOSE=false                         # Extra debug output
 ```
 
 ## Recent Updates
