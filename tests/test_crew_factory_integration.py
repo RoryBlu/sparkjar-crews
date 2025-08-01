@@ -61,9 +61,9 @@ def test_yaml_vs_direct_crew_equivalence():
     assert len(storage_agent.tools) == 1, "Storage agent should have 1 tool"
     
     # Verify tool types
-    from tools.google_drive_download_tool import GoogleDriveDownloadTool
-    from tools.image_viewer_tool import ImageViewerTool
-    from tools.sync_db_storage_tool import SyncDBStorageTool
+    from sparkjar_shared.tools.google_drive_download_tool import GoogleDriveDownloadTool
+    from sparkjar_shared.tools.image_viewer_tool import ImageViewerTool
+    from sparkjar_shared.tools.sync_db_storage_tool import SyncDBStorageTool
     
     assert isinstance(download_agent.tools[0], GoogleDriveDownloadTool), "Download agent should have GoogleDriveDownloadTool"
     assert isinstance(ocr_agent.tools[0], ImageViewerTool), "OCR agent should have ImageViewerTool"

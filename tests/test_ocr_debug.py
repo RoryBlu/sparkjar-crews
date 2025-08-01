@@ -3,7 +3,7 @@ import sys
 import os
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from tools.image_viewer_tool import ImageViewerTool
+from sparkjar_shared.tools.image_viewer_tool import ImageViewerTool
 
 # Test with a simple image
 tool = ImageViewerTool()

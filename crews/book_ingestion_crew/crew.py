@@ -14,10 +14,10 @@ import openai
 openai.api_key = os.environ.get('OPENAI_API_KEY')
 
 # Import needed tools
-from tools.google_drive_tool import GoogleDriveTool
-from tools.google_drive_download_tool import GoogleDriveDownloadTool
-from tools.image_viewer_tool import ImageViewerTool
-from tools.sync_db_storage_tool import SyncDBStorageTool
+from sparkjar_shared.tools.google_drive_tool import GoogleDriveTool
+from sparkjar_shared.tools.google_drive_download_tool import GoogleDriveDownloadTool
+from sparkjar_shared.tools.image_viewer_tool import ImageViewerTool
+from sparkjar_shared.tools.sync_db_storage_tool import SyncDBStorageTool
 
 # Import utility functions (using new comprehensive utilities with backward compatibility)
 from crews.book_ingestion_crew.file_processing_utils import (

@@ -22,7 +22,7 @@ import uuid
 # Import the tool to test
 import sys
 sys.path.append(str(Path(__file__).parent.parent.parent.parent))
-from tools.sync_db_storage_tool import SyncDBStorageTool
+from sparkjar_shared.tools.sync_db_storage_tool import SyncDBStorageTool
 
 
 class TestSyncDBStorageTool:

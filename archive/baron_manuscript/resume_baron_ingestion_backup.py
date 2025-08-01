@@ -117,9 +117,9 @@ def process_single_page(config, page_number, file_name, file_id):
     # Since the crew doesn't support single file mode directly,
     # we'll use a workaround by creating a custom crew instance
     from crews.book_ingestion_crew.crew import build_production_crew
-    from tools.google_drive_download_tool import GoogleDriveDownloadTool
-    from tools.image_viewer_tool import ImageViewerTool
-    from tools.sync_db_storage_tool import SyncDBStorageTool
+    from sparkjar_shared.tools.google_drive_download_tool import GoogleDriveDownloadTool
+    from sparkjar_shared.tools.image_viewer_tool import ImageViewerTool
+    from sparkjar_shared.tools.sync_db_storage_tool import SyncDBStorageTool
     
     try:
         # Create crew

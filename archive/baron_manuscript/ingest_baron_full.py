@@ -17,10 +17,10 @@ load_dotenv()
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'sparkjar-shared'))
 
-from tools.google_drive_tool import GoogleDriveTool
-from tools.google_drive_download_tool import GoogleDriveDownloadTool  
-from tools.image_viewer_tool import ImageViewerTool
-from tools.sync_db_storage_tool import SyncDBStorageTool
+from sparkjar_shared.tools.google_drive_tool import GoogleDriveTool
+from sparkjar_shared.tools.google_drive_download_tool import GoogleDriveDownloadTool  
+from sparkjar_shared.tools.image_viewer_tool import ImageViewerTool
+from sparkjar_shared.tools.sync_db_storage_tool import SyncDBStorageTool
 from crews.book_ingestion_crew.utils import sort_book_files
 
 

@@ -20,7 +20,7 @@ import tempfile
 # Import the tool to test
 import sys
 sys.path.append(str(Path(__file__).parent.parent.parent.parent))
-from tools.image_viewer_tool import ImageViewerTool
+from sparkjar_shared.tools.image_viewer_tool import ImageViewerTool
 
 
 class TestImageViewerTool:

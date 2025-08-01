@@ -17,9 +17,9 @@ import os
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from crews.book_ingestion_crew.crew import build_crew_from_yaml, _create_tool_instance, _load_yaml
-from tools.google_drive_download_tool import GoogleDriveDownloadTool
-from tools.image_viewer_tool import ImageViewerTool
-from tools.sync_db_storage_tool import SyncDBStorageTool
+from sparkjar_shared.tools.google_drive_download_tool import GoogleDriveDownloadTool
+from sparkjar_shared.tools.image_viewer_tool import ImageViewerTool
+from sparkjar_shared.tools.sync_db_storage_tool import SyncDBStorageTool
 from crewai import Process
 
 def test_yaml_loading():

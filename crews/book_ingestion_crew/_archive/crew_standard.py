@@ -5,10 +5,10 @@ from crewai import Agent, Crew, Process, Task
 import logging
 
 # Import needed tools
-from tools.google_drive_tool import GoogleDriveTool
-from tools.image_viewer_tool import ImageViewerTool
-from tools.sj_sequential_thinking_tool import SJSequentialThinkingTool
-from tools.simple_db_storage_tool import SimpleDBStorageTool
+from sparkjar_shared.tools.google_drive_tool import GoogleDriveTool
+from sparkjar_shared.tools.image_viewer_tool import ImageViewerTool
+from sparkjar_shared.tools.memory.sj_sequential_thinking_tool import SJSequentialThinkingTool
+from sparkjar_shared.tools.simple_db_storage_tool import SimpleDBStorageTool
 
 logger = logging.getLogger(__name__)
 

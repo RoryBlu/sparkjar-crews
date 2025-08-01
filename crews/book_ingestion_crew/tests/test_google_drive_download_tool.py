@@ -20,7 +20,7 @@ import io
 # Import the tool to test
 import sys
 sys.path.append(str(Path(__file__).parent.parent.parent.parent))
-from tools.google_drive_download_tool import GoogleDriveDownloadTool
+from sparkjar_shared.tools.google_drive_download_tool import GoogleDriveDownloadTool
 
 
 class TestGoogleDriveDownloadTool:

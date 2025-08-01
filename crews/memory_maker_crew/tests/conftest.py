@@ -8,8 +8,8 @@ import pytest
 if "sparkjar_shared.crews" not in sys.modules:
     sparkjar_shared = types.ModuleType("sparkjar_shared")
     crews_mod = types.ModuleType("sparkjar_shared.crews")
-    from utils.simple_crew_logger import SimpleCrewLogger
-    from utils.crew_logger import CrewExecutionLogger
+    from sparkjar_shared.utils.simple_crew_logger import SimpleCrewLogger
+    from sparkjar_shared.utils.crew_logger import CrewExecutionLogger
     crews_mod.SimpleCrewLogger = SimpleCrewLogger
     crews_mod.CrewExecutionLogger = CrewExecutionLogger
     sparkjar_shared.crews = crews_mod
